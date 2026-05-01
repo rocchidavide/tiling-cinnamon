@@ -1,0 +1,48 @@
+/* Tiling overlay zone */
+.tiling-overlay {
+    background-color: rgba(53, 132, 228, 0.2);
+    border: 2px solid rgba(53, 132, 228, 0.8);
+    border-radius: 8px;
+    transition-duration: 100ms;
+    transition-timing-function: ease-in-out;
+    transition-property: background-color;
+}
+
+.tiling-overlay:hover,
+.tiling-overlay-hover {
+    background-color: rgba(53, 132, 228, 0.4);
+}
+
+/* Snap Assistant container */
+.snap-assistant-container {
+    background-color: rgba(0, 0, 0, 0.8);
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Individual snap assistant tile */
+.snap-assistant-tile {
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    margin: 5px;
+}
+
+.snap-assistant-tile:hover {
+    background-color: rgba(53, 132, 228, 0.5);
+}
+
+/* Panel indicator button */
+.tiling-panel-button {
+    padding: 0 4px;
+}
+
+.tiling-panel-icon {
+    icon-size: 16px;
+}
+
+/* Window border highlight for tiled windows */
+.tiling-window-border {
+    border: 2px solid rgba(53, 132, 228, 1.0);
+    border-radius: 4px;
+}
