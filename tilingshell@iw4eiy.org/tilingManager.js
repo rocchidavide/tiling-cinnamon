@@ -3,7 +3,7 @@
 
 const St = imports.gi.St;
 const Meta = imports.gi.Meta;
-const Clutter = imports.gi.Clutter;
+const GLib = imports.gi.GLib;
 const Main = imports.ui.main;
 const Lang = imports.lang;
 const Utils = imports.utils;
@@ -34,6 +34,7 @@ TilingManager.prototype = {
         this._signals = [];
         this._draggingWindow = null;
         this._originalGeometries = new Map(); // window -> {x,y,width,height}
+        this._pollId = 0;
     },
 
     /**
@@ -96,11 +97,59 @@ TilingManager.prototype = {
             });
         }
 
-        // Connect pointer-motion to track drag position
-        this._motionId = global.stage.connect(
-            'captured-event',
-            Lang.bind(this, this._onCapturedEvent)
-        );
+        // Poll pointer position during drag.
+        // We cannot use Clutter's captured-event here: during an X11/Wayland
+        // window-move grab, Muffin owns the pointer and motion events are NOT
+        // forwarded through the Clutter stage event loop.  A GLib timeout that
+        // reads global.get_pointer() is the reliable cross-version alternative.
+        this._startMotionPolling();
+    },
+
+    /**
+     * Start a GLib timeout that polls the pointer position during a drag.
+     * Runs every 50 ms – fast enough for smooth overlay highlighting without
+     * being heavy on the CPU.
+     */
+    _startMotionPolling: function() {
+        if (this._pollId) return;
+        this._pollId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50,
+            Lang.bind(this, this._onPollPointer));
+    },
+
+    /**
+     * Stop the polling timer.
+     */
+    _stopMotionPolling: function() {
+        if (this._pollId) {
+            GLib.source_remove(this._pollId);
+            this._pollId = 0;
+        }
+    },
+
+    /**
+     * Polling callback: called every 50 ms while a drag is in progress.
+     * Shows/hides the overlay based on the current modifier state and updates
+     * the highlighted tile under the pointer.
+     *
+     * @returns {boolean} GLib.SOURCE_CONTINUE to keep the timer alive,
+     *                    GLib.SOURCE_REMOVE to stop it.
+     */
+    _onPollPointer: function() {
+        if (!this._draggingWindow) {
+            this._pollId = 0;
+            return GLib.SOURCE_REMOVE;
+        }
+
+        let modifierKey = this._settings.getValue('tiling-modifier-key') || 'Control';
+        if (this._isModifierPressed(modifierKey)) {
+            this.showTilingOverlay();
+            let [x, y] = global.get_pointer();
+            this._updateHoveredTile(x, y);
+        } else {
+            this.hideTilingOverlay();
+        }
+
+        return GLib.SOURCE_CONTINUE;
     },
 
     /**
@@ -123,16 +172,15 @@ TilingManager.prototype = {
 
         if (op !== Meta.GrabOp.MOVING) return;
 
-        // Disconnect motion tracking
-        if (this._motionId) {
-            try { global.stage.disconnect(this._motionId); } catch (e) {}
-            this._motionId = 0;
-        }
+        // Stop the polling timer
+        this._stopMotionPolling();
 
         if (this._draggingWindow && this._settings.getValue('enable-tiling-system')) {
-            // Check if modifier key is held
-            let modifierKey = this._settings.getValue('tiling-modifier-key') || 'Control';
-            if (this._isModifierPressed(modifierKey) && this._hoveredTileIndex >= 0) {
+            // _hoveredTileIndex >= 0 means the overlay was visible and the pointer
+            // was over a tile when the user dropped the window.  This is only true
+            // when the modifier was held throughout the drag, so no extra modifier
+            // check is needed here.
+            if (this._hoveredTileIndex >= 0) {
                 let layout = this._layoutManager.loadLayout(this._currentLayoutId);
                 if (layout && layout.tiles[this._hoveredTileIndex]) {
                     this._tileWindowToTile(
@@ -146,25 +194,6 @@ TilingManager.prototype = {
         this._draggingWindow = null;
         this._hoveredTileIndex = -1;
         this.hideTilingOverlay();
-    },
-
-    /**
-     * Track pointer movement during a window drag.
-     */
-    _onCapturedEvent: function(actor, event) {
-        if (event.type() !== Clutter.EventType.MOTION) return Clutter.EVENT_PROPAGATE;
-        if (!this._draggingWindow) return Clutter.EVENT_PROPAGATE;
-
-        let modifierKey = this._settings.getValue('tiling-modifier-key') || 'Control';
-        if (this._isModifierPressed(modifierKey)) {
-            this.showTilingOverlay();
-            let [x, y] = event.get_coords();
-            this._updateHoveredTile(x, y);
-        } else {
-            this.hideTilingOverlay();
-        }
-
-        return Clutter.EVENT_PROPAGATE;
     },
 
     /**
@@ -415,11 +444,8 @@ TilingManager.prototype = {
      * Disconnect all signals, remove overlay, clean up resources.
      */
     destroy: function() {
-        // Disconnect motion signal if active
-        if (this._motionId) {
-            try { global.stage.disconnect(this._motionId); } catch (e) {}
-            this._motionId = 0;
-        }
+        // Stop pointer polling if active
+        this._stopMotionPolling();
 
         // Disconnect display signals
         this._signals.forEach(function(sig) {

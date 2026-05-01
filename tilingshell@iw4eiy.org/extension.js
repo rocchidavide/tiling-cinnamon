@@ -20,6 +20,7 @@ let tilingManagers        = [];     // One per monitor
 let keybindingsInstance   = null;
 let snapAssistantInstance = null;
 let monitorSignalId       = 0;
+let monitorSignalObj      = null; // object that owns the monitors-changed signal
 
 /**
  * init() is called once when Cinnamon loads the extension.
@@ -81,11 +82,16 @@ function enable() {
         );
         keybindingsInstance.enable();
 
-        // Watch for monitor configuration changes
-        monitorSignalId = global.screen.connect(
-            'monitors-changed',
-            _onMonitorsChanged
-        );
+        // Watch for monitor configuration changes.
+        // In Cinnamon < 5.4, monitors-changed is on Meta.Screen (global.screen).
+        // In Cinnamon 5.4+, it is on Meta.Display (global.display).
+        monitorSignalObj = global.display || global.screen;
+        if (monitorSignalObj) {
+            monitorSignalId = monitorSignalObj.connect(
+                'monitors-changed',
+                _onMonitorsChanged
+            );
+        }
 
     } catch (e) {
         global.logError('TilingShell: Failed to enable: ' + e.message);
@@ -99,9 +105,10 @@ function enable() {
 function disable() {
     try {
         // Disconnect monitor-change signal
-        if (monitorSignalId && global.screen) {
-            try { global.screen.disconnect(monitorSignalId); } catch (e) {}
+        if (monitorSignalId && monitorSignalObj) {
+            try { monitorSignalObj.disconnect(monitorSignalId); } catch (e) {}
             monitorSignalId = 0;
+            monitorSignalObj = null;
         }
 
         // Destroy keybindings
