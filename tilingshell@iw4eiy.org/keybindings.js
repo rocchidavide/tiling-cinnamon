@@ -23,16 +23,49 @@ KeybindingsManager.prototype = {
 
     /**
      * Register all keyboard shortcuts.
-     * Note: <Super>Arrow keys are reserved by Cinnamon's built-in window snapping,
-     * so we use <Super><Shift>Arrow to avoid conflicts.
+     *
+     * Bindings are read from the extension settings so the user can customise
+     * them via System Settings → Extensions → Tiling Shell → Configure.
+     *
+     * Default values use <Super><Alt>Arrow which do NOT conflict with
+     * Cinnamon's built-in workspace-management shortcuts
+     * (<Super><Shift>Arrow = move window to adjacent workspace).
      */
     enable: function() {
-        this._addKeybinding('tile-left',    '<Super><Shift>Left',  Lang.bind(this, this._onTileLeft));
-        this._addKeybinding('tile-right',   '<Super><Shift>Right', Lang.bind(this, this._onTileRight));
-        this._addKeybinding('tile-up',      '<Super><Shift>Up',    Lang.bind(this, this._onTileUp));
-        this._addKeybinding('tile-down',    '<Super><Shift>Down',  Lang.bind(this, this._onTileDown));
-        this._addKeybinding('untile-window','<Super>m',            Lang.bind(this, this._onUntile));
-        this._addKeybinding('cycle-layout', '<Super><Shift>Tab',   Lang.bind(this, this._onCycleLayout));
+        // Helper: settings may store a keybinding as a plain string or as a
+        // JSON array (Cinnamon 6.x wraps single keybindings in an array).
+        // Normalise to a plain string in either case.
+        let s = this._settings;
+        function kb(key, fallback) {
+            let v = s.getValue(key);
+            if (!v) return fallback;
+            if (Array.isArray(v)) return v[0] || fallback;
+            return String(v) || fallback;
+        }
+
+        this._addKeybinding('tile-left',
+            kb('keybinding-tile-left',   '<Super><Alt>Left'),
+            Lang.bind(this, this._onTileLeft));
+
+        this._addKeybinding('tile-right',
+            kb('keybinding-tile-right',  '<Super><Alt>Right'),
+            Lang.bind(this, this._onTileRight));
+
+        this._addKeybinding('tile-up',
+            kb('keybinding-tile-up',     '<Super><Alt>Up'),
+            Lang.bind(this, this._onTileUp));
+
+        this._addKeybinding('tile-down',
+            kb('keybinding-tile-down',   '<Super><Alt>Down'),
+            Lang.bind(this, this._onTileDown));
+
+        this._addKeybinding('untile-window',
+            kb('keybinding-untile',      '<Super>m'),
+            Lang.bind(this, this._onUntile));
+
+        this._addKeybinding('cycle-layout',
+            kb('keybinding-cycle-layout','<Super><Alt>c'),
+            Lang.bind(this, this._onCycleLayout));
     },
 
     /**
@@ -43,7 +76,12 @@ KeybindingsManager.prototype = {
      */
     _addKeybinding: function(name, binding, callback) {
         try {
-            Main.keybindingManager.addHotKey(name, binding, callback);
+            let ok = Main.keybindingManager.addHotKey(name, binding, callback);
+            if (ok === false) {
+                global.logError('TilingShell: Keybinding conflict – could not register "'
+                    + name + '" (' + binding + '). Change it in the extension settings.');
+                return;
+            }
             this._keybindings.push(name);
         } catch (e) {
             global.logError('TilingShell: Failed to add keybinding ' + name + ': ' + e.message);

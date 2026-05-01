@@ -15,16 +15,26 @@ Advanced tiling window management for Cinnamon Desktop, ported from the GNOME Sh
 ## Installation
 
 ```bash
-# Clone to Cinnamon extensions directory
-cd ~/.local/share/cinnamon/extensions/
-git clone https://github.com/rocchidavide/tiling-cinnamon.git tilingshell@iw4eiy.org
+# Clone the repository anywhere you like (e.g. your home directory)
+git clone https://github.com/rocchidavide/tiling-cinnamon.git ~/tiling-cinnamon
 
-# Restart Cinnamon
+# Symlink the extension subdirectory into Cinnamon's extensions folder
+# (the symlink name MUST match the UUID exactly)
+mkdir -p ~/.local/share/cinnamon/extensions/
+ln -sf ~/tiling-cinnamon/tilingshell@iw4eiy.org \
+       ~/.local/share/cinnamon/extensions/tilingshell@iw4eiy.org
+
+# Restart Cinnamon  (press Alt+F2, type 'r', press Enter – or log out/in)
 cinnamon --replace &
 
 # Enable the extension
 # System Settings → Extensions → Tiling Shell
 ```
+
+> **Why a symlink?**  The repository root contains both the extension folder
+> (`tilingshell@iw4eiy.org/`) and other files (README, .git, …).  Cinnamon
+> requires that `extension.js` lives *directly* inside the UUID-named
+> directory, so the symlink points at the inner folder, not the repo root.
 
 ## Development Status
 
@@ -58,16 +68,18 @@ cinnamon --replace &
 
 ### Keyboard Shortcuts
 
-> **Nota**: `Super+Freccia` è riservato da Cinnamon per il suo snap nativo, quindi questa estensione usa `Super+Shift+Freccia`.
+Default shortcuts use `Super+Alt+Arrow` — these do **not** conflict with
+Cinnamon's built-in workspace-management shortcuts (`Super+Shift+Arrow`).
+All shortcuts can be changed in **System Settings → Extensions → Tiling Shell → Configure**.
 
-| Scorciatoia | Azione |
-|-------------|--------|
-| `Super + Shift + ←` | Finestra a sinistra (metà schermo) |
-| `Super + Shift + →` | Finestra a destra (metà schermo) |
-| `Super + Shift + ↑` | Massimizza finestra |
-| `Super + Shift + ↓` | Finestra in basso (metà schermo) |
-| `Super + M` | Ripristina / rimuovi tiling |
-| `Super + Shift + Tab` | Cicla tra i layout |
+| Shortcut | Action |
+|----------|--------|
+| `Super + Alt + ←` | Tile window to left half |
+| `Super + Alt + →` | Tile window to right half |
+| `Super + Alt + ↑` | Maximize window |
+| `Super + Alt + ↓` | Tile window to bottom half |
+| `Super + M` | Restore / untile window |
+| `Super + Alt + C` | Cycle to next layout |
 
 ## Configuration
 

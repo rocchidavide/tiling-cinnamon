@@ -68,5 +68,35 @@
         "step": 2,
         "units": "pixels",
         "description": "Gap size between tiled windows"
+    },
+    "keybinding-tile-left": {
+        "type": "keybinding",
+        "default": "<Super><Alt>Left",
+        "description": "Tile window to left half"
+    },
+    "keybinding-tile-right": {
+        "type": "keybinding",
+        "default": "<Super><Alt>Right",
+        "description": "Tile window to right half"
+    },
+    "keybinding-tile-up": {
+        "type": "keybinding",
+        "default": "<Super><Alt>Up",
+        "description": "Maximize window"
+    },
+    "keybinding-tile-down": {
+        "type": "keybinding",
+        "default": "<Super><Alt>Down",
+        "description": "Tile window to bottom half"
+    },
+    "keybinding-untile": {
+        "type": "keybinding",
+        "default": "<Super>m",
+        "description": "Restore / untile window"
+    },
+    "keybinding-cycle-layout": {
+        "type": "keybinding",
+        "default": "<Super><Alt>c",
+        "description": "Cycle to next layout"
     }
 }
