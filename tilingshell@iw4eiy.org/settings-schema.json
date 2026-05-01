@@ -1,0 +1,72 @@
+{
+    "enable-tiling-system": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Enable tiling system",
+        "tooltip": "Show tiling overlay when dragging windows"
+    },
+    "tiling-modifier-key": {
+        "type": "combobox",
+        "default": "Control",
+        "options": {
+            "Control": "Ctrl",
+            "Alt": "Alt",
+            "Shift": "Shift"
+        },
+        "description": "Modifier key for tiling",
+        "tooltip": "Hold this key while dragging a window to show tiling zones"
+    },
+    "enable-snap-assistant": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Enable Snap Assistant",
+        "tooltip": "Windows 11-style snap assistant at top of screen"
+    },
+    "snap-assistant-threshold": {
+        "type": "spinbutton",
+        "default": 30,
+        "min": 10,
+        "max": 100,
+        "step": 5,
+        "units": "pixels",
+        "description": "Snap Assistant activation distance"
+    },
+    "selected-layout": {
+        "type": "combobox",
+        "default": "2-columns",
+        "options": {
+            "2-columns": "2 Columns",
+            "3-columns": "3 Columns",
+            "grid-2x2": "2x2 Grid",
+            "left-main": "Main Left",
+            "right-main": "Main Right"
+        },
+        "description": "Default tiling layout"
+    },
+    "show-layout-panel-icon": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Show panel indicator",
+        "tooltip": "Display layout selector in the panel"
+    },
+    "enable-window-borders": {
+        "type": "checkbox",
+        "default": true,
+        "description": "Highlight tiled windows"
+    },
+    "border-color": {
+        "type": "colorchooser",
+        "default": "rgba(53, 132, 228, 1.0)",
+        "description": "Border color for tiled windows",
+        "dependency": "enable-window-borders"
+    },
+    "gaps-size": {
+        "type": "spinbutton",
+        "default": 8,
+        "min": 0,
+        "max": 50,
+        "step": 2,
+        "units": "pixels",
+        "description": "Gap size between tiled windows"
+    }
+}
