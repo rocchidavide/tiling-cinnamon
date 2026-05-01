@@ -62,8 +62,22 @@ TilingManager.prototype = {
 
     /**
      * Called when a grab operation begins (e.g. window drag starts).
+     * Handles both Muffin signal signatures:
+     *   Old (Cinnamon < 5.6): grab-op-begin(display, screen, window, op)
+     *   New (Cinnamon >= 5.6): grab-op-begin(display, window, op)
      */
-    _onGrabOpBegin: function(display, screen, window, op) {
+    _onGrabOpBegin: function(display, screenOrWindow, windowOrOp, opOrUndefined) {
+        let window, op;
+        if (opOrUndefined === undefined) {
+            // New signature: (display, window, op)
+            window = screenOrWindow;
+            op = windowOrOp;
+        } else {
+            // Old signature: (display, screen, window, op)
+            window = windowOrOp;
+            op = opOrUndefined;
+        }
+
         // Only react to window move operations
         if (op !== Meta.GrabOp.MOVING) return;
         if (!window) return;
@@ -91,8 +105,22 @@ TilingManager.prototype = {
 
     /**
      * Called when a grab operation ends (window dropped).
+     * Handles both Muffin signal signatures:
+     *   Old (Cinnamon < 5.6): grab-op-end(display, screen, window, op)
+     *   New (Cinnamon >= 5.6): grab-op-end(display, window, op)
      */
-    _onGrabOpEnd: function(display, screen, window, op) {
+    _onGrabOpEnd: function(display, screenOrWindow, windowOrOp, opOrUndefined) {
+        let window, op;
+        if (opOrUndefined === undefined) {
+            // New signature: (display, window, op)
+            window = screenOrWindow;
+            op = windowOrOp;
+        } else {
+            // Old signature: (display, screen, window, op)
+            window = windowOrOp;
+            op = opOrUndefined;
+        }
+
         if (op !== Meta.GrabOp.MOVING) return;
 
         // Disconnect motion tracking

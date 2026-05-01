@@ -58,11 +58,16 @@ cinnamon --replace &
 
 ### Keyboard Shortcuts
 
-- `Super + Left/Right/Up/Down`: Tile window to direction
-- `Super + Shift + Arrows`: Span window across multiple tiles
-- `Super + M`: Maximize/untile window
-- `Super + C`: Center window
-- `Super + Tab`: Cycle through layouts
+> **Nota**: `Super+Freccia` è riservato da Cinnamon per il suo snap nativo, quindi questa estensione usa `Super+Shift+Freccia`.
+
+| Scorciatoia | Azione |
+|-------------|--------|
+| `Super + Shift + ←` | Finestra a sinistra (metà schermo) |
+| `Super + Shift + →` | Finestra a destra (metà schermo) |
+| `Super + Shift + ↑` | Massimizza finestra |
+| `Super + Shift + ↓` | Finestra in basso (metà schermo) |
+| `Super + M` | Ripristina / rimuovi tiling |
+| `Super + Shift + Tab` | Cicla tra i layout |
 
 ## Configuration
 

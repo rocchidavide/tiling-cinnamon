@@ -152,7 +152,9 @@ function _createTilingManagers() {
     });
     tilingManagers = [];
 
-    let workspace = global.workspace_manager.get_active_workspace();
+    // Support both modern (5.4+) and older Cinnamon APIs
+    let workspaceManager = global.workspace_manager || global.screen;
+    let workspace = workspaceManager.get_active_workspace();
     let nMonitors = global.display.get_n_monitors();
 
     for (let i = 0; i < nMonitors; i++) {

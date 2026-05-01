@@ -23,14 +23,16 @@ KeybindingsManager.prototype = {
 
     /**
      * Register all keyboard shortcuts.
+     * Note: <Super>Arrow keys are reserved by Cinnamon's built-in window snapping,
+     * so we use <Super><Shift>Arrow to avoid conflicts.
      */
     enable: function() {
-        this._addKeybinding('tile-left',    '<Super>Left',  Lang.bind(this, this._onTileLeft));
-        this._addKeybinding('tile-right',   '<Super>Right', Lang.bind(this, this._onTileRight));
-        this._addKeybinding('tile-up',      '<Super>Up',    Lang.bind(this, this._onTileUp));
-        this._addKeybinding('tile-down',    '<Super>Down',  Lang.bind(this, this._onTileDown));
-        this._addKeybinding('untile-window','<Super>m',     Lang.bind(this, this._onUntile));
-        this._addKeybinding('cycle-layout', '<Super>Tab',   Lang.bind(this, this._onCycleLayout));
+        this._addKeybinding('tile-left',    '<Super><Shift>Left',  Lang.bind(this, this._onTileLeft));
+        this._addKeybinding('tile-right',   '<Super><Shift>Right', Lang.bind(this, this._onTileRight));
+        this._addKeybinding('tile-up',      '<Super><Shift>Up',    Lang.bind(this, this._onTileUp));
+        this._addKeybinding('tile-down',    '<Super><Shift>Down',  Lang.bind(this, this._onTileDown));
+        this._addKeybinding('untile-window','<Super>m',            Lang.bind(this, this._onUntile));
+        this._addKeybinding('cycle-layout', '<Super><Shift>Tab',   Lang.bind(this, this._onCycleLayout));
     },
 
     /**

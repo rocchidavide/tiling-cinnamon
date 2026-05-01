@@ -39,7 +39,8 @@ WindowTracker.prototype = {
      * Track all windows already present when the extension is enabled.
      */
     _trackExistingWindows: function() {
-        let workspace = global.workspace_manager.get_active_workspace();
+        let workspaceManager = global.workspace_manager || global.screen;
+        let workspace = workspaceManager.get_active_workspace();
         let windows = workspace.list_windows();
         windows.forEach(Lang.bind(this, function(win) {
             if (this._isWindowTileable(win)) {

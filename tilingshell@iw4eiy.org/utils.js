@@ -34,7 +34,8 @@ function getPrimaryMonitor() {
  */
 function getWorkArea(monitorIndex, workspace) {
     if (!workspace) {
-        workspace = global.workspace_manager.get_active_workspace();
+        let workspaceManager = global.workspace_manager || global.screen;
+        workspace = workspaceManager.get_active_workspace();
     }
     return workspace.get_work_area_for_monitor(monitorIndex);
 }
@@ -44,7 +45,8 @@ function getWorkArea(monitorIndex, workspace) {
  * @returns {Meta.Window[]} Array of tileable windows.
  */
 function getActiveWindows() {
-    let workspace = global.workspace_manager.get_active_workspace();
+    let workspaceManager = global.workspace_manager || global.screen;
+    let workspace = workspaceManager.get_active_workspace();
     return workspace.list_windows().filter(function(w) {
         return isWindowTileable(w);
     });
